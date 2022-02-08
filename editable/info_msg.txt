@@ -2,11 +2,15 @@
 
  Available Command: 
  
-1) -p (to play + queue song) (X)
-2) -pause / -resume (to pause / resume) (X)
-3) -skip (to skip song) (X)
-4) -dc (to disconnect) (X)
-5) -stop (to stop song immediately) (X)
-6) -ping (to check bot's ping) (X)
+ Music Commands :
+    1) -p (to play + queue song) (X)
+    2) -pause / -resume (to pause / resume) (X)
+    3) -skip (to skip song) (X)
+    4) -dc (to disconnect) (X)
+    5) -stop (to stop song immediately) (X)
+
+Other Commands
+    1) -motivation (to motivate yourself ^_^)
+
  
  Thank You for using our service!
