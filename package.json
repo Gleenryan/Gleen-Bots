@@ -1,0 +1,19 @@
+{
+  "name": "astro-bots",
+  "version": "1.0.0",
+  "description": "Music Bots",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gleenryan/Astro-Bots.git"
+  },
+  "author": "Gleen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gleenryan/Astro-Bots/issues"
+  },
+  "homepage": "https://github.com/Gleenryan/Astro-Bots#readme"
+}
