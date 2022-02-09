@@ -1,8 +1,17 @@
 const config = require("./config.json");
-const { Client, Intents } = require("discord.js");
+const { Client, Intents, DiscordAPIError, Collection } = require("discord.js");
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-const fs = require("fs")
-const fetch = require("node-fetch")
+const fs = require("fs");
+const PREFIX = "-";
+
+
+client.commands = new Collection();
+const commandFiles = fs.readdirSync("./modules/commands/").filter(file => file.endsWith(".js"));
+for (const file of commandFiles) {
+    const command = require(`./modules/commands/${file}`);
+
+    client.commands.set(command.name, command);
+}
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Array~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Array for Status
@@ -10,7 +19,7 @@ const Status_bot = ["Music Bot", "Music Bot", "-info for some info"];
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //Array for Motivation
-const Motivation_trigger = ["-motivasi", "-motivate", "-motivation"]
+const Motivation_trigger = ["motivasi", "motivate", "motivation"]
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~ CODING-ZONE! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,40 +35,27 @@ client.on("ready", () => {
 
 
 client.on("messageCreate", msg => {
-    // Telling the bot to not listen to itself
     if (msg.author.bot) return
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // -info
-    if (msg.content === "-info") {
+    if (!msg.content.startsWith(PREFIX)) return
+
+    const args = msg.content.slice(PREFIX.length).split(" ");
+    const command = args.shift().toLowerCase();
+
+    if (command == 'ping') {
+        client.commands.get('ping').execute(msg, args);
+    }
+
+    if (Motivation_trigger.some(word => command.includes(word))) {
+        client.commands.get('motivation').execute(msg, args)
+    }
+
+    if (command == 'info') {
         info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
-        msg.reply(info_msg.toString());
+        msg.reply(info_msg.toString())
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // -motivation
-    if (Motivation_trigger.some(word => msg.content.includes(word))) {
-        getQuote().then(quote => msg.reply(quote))
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 })
-
-
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~functions~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// -motivation
-function getQuote() {
-    return fetch("https://zenquotes.io/api/random")
-        .then(res => {
-            return res.json()
-        })
-        .then(data => {
-            return data[0]["q"] + " -" + data[0]["a"]
-        })
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // loggin in
 client.login(config.token);
