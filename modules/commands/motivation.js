@@ -2,7 +2,8 @@ const fetch = require("node-fetch")
 
 module.exports = {
     name: 'motivation',
-    execute(msg, args) {
+    aliases: ["motivate", "motivation"],
+    execute(msg) {
         getQuote().then(quote => msg.reply(quote))
 
     }

@@ -1,5 +1,5 @@
 const config = require("./config.json");
-const { Client, Intents, DiscordAPIError, Collection } = require("discord.js");
+const { Client, Intents, DiscordAPIError, Collection, Message } = require("discord.js");
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 const fs = require("fs");
 const PREFIX = "-";
@@ -18,9 +18,6 @@ for (const file of commandFiles) {
 const Status_bot = ["Music Bot", "Music Bot", "-info for some info"];
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//Array for Motivation
-const Motivation_trigger = ["motivasi", "motivate", "motivation"]
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~ CODING-ZONE! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Checking if the bot is online and setting status
@@ -42,17 +39,28 @@ client.on("messageCreate", msg => {
     const args = msg.content.slice(PREFIX.length).split(" ");
     const command = args.shift().toLowerCase();
 
+    const cmd = client.commands.find(a => a.aliases && a.aliases.includes(command))
+    if (cmd) cmd.execute(msg, args, command)
+
     if (command == 'ping') {
         client.commands.get('ping').execute(msg, args);
+
     }
 
-    if (Motivation_trigger.some(word => command.includes(word))) {
-        client.commands.get('motivation').execute(msg, args)
+    if (command == 'motivasi') {
+        client.commands.get('motivation').execute(msg)
     }
 
     if (command == 'info') {
         info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
         msg.reply(info_msg.toString())
+    }
+
+    if (command == 'p') {
+        if (!args.length) return msg.channel.send("no tittle song detected!, plz try again")
+        client.commands.get('play').execute(msg, args, command, client)
+
+
     }
 
 })
