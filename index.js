@@ -51,10 +51,10 @@ client.on("messageCreate", msg => {
     //     client.commands.get('motivation').execute(msg)
     // }
 
-    if (command == 'info') {
-        info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
-        msg.reply(info_msg.toString())
-    }
+    // if (command == 'info') {
+    //     info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
+    //     msg.reply(info_msg.toString())
+    // }
 
     // if (command == 'p') {
     //     if (!args.length) return msg.channel.send("no tittle song detected!, plz try again")

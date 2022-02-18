@@ -8,7 +8,7 @@ const queue = new Map();
 
 module.exports = {
     name: 'play',
-    aliases: 'play',
+    aliases: ['play', 'p'],
     description: 'play a song',
     async execute(msg, args, command, client) {
 
@@ -83,8 +83,8 @@ const video_player = async (guild, song, connection) => {
 
 
     if (!song) {
-        song_queue.voice_channel.leave()
-        // connection.disconnect()
+        // song_queue.voice_channel.leave()
+        connection.disconnect()
         queue.delete(guild.id)
         return
     }
