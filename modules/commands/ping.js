@@ -1,11 +1,11 @@
-// module.exports = {
-//     name: 'ping',
-//     aliases: ["pong", "pang", "pung"],
-//     description: 'ping',
-//     execute(msg, args) {
-//         bol = "uno" + args
+module.exports = {
+    name: 'ping',
+    aliases: ["pong", "pang", "pung", "ping"],
+    description: 'ping',
+    execute(msg, args, client) {
 
-//         msg.channel.send(bol)
 
-//     }
-// }
+        msg.channel.send(`🏓Latency is ${Date.now() - msg.createdTimestamp}ms.`);
+
+    }
+}

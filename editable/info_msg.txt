@@ -1,13 +1,15 @@
-**UPDATE 8 / 02 / 2022
+**UPDATE 22 / 02 / 2022
 
  Available Command: 
  
  Music Commands :
-    1) -p (to play + queue song) (X)
+    1) -p [tittle of the songs / url] (to play + queue song) (X)
     2) -pause / -resume (to pause / resume) (X)
     3) -skip (to skip song) (X)
-    4) -dc (to disconnect) (X)
-    5) -stop (to stop song immediately) (X)
+    4) -dc (to disconnect) 
+    5) 
+    6) -r [song number] (to remove song from queue)
+    7) -q (to show the queue)
 
 Other Commands
     1) -motivation (to motivate yourself ^_^)
