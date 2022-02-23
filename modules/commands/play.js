@@ -3,15 +3,27 @@ const ytSearch = require("yt-search");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require("@discordjs/voice");
 
 const queue = new Map()
+play_trigger = ['play', 'p']
+// if (play_trigger.some(word => command.includes(word)))
+
 
 module.exports = {
     name: 'play',
-    aliases: ['play', 'p', 'q', 'skip', 'r', 'dc'],
+    aliases: ['play', 'p', 'q', 'r', 'dc', 'skip'],
     description: 'play a song',
     async execute(msg, args, command, client,) {
 
         const server_queue = queue.get(msg.guild.id);
         const voice_channel = msg.member.voice.channel;
+
+        const queue_constractor = {
+            voice_channel: voice_channel,
+            text_channel: msg.channel,
+            connection: null,
+            playing: true,
+            songs: [],
+            songDispatcher: null
+        }
 
         if (!voice_channel) return msg.channel.send('You need to be in a channel!')
 
@@ -23,41 +35,29 @@ module.exports = {
 
             // masukkin lagu ke queue
             if (!server_queue) {
-                const queue_constractor = {
-                    voice_channel: voice_channel,
-                    text_channel: msg.channel,
-                    connection: null,
-                    playing: true,
-                    songs: [],
-                    songDispatcher: null
-                }
+
                 queue.set(msg.guild.id, queue_constractor)
                 queue_constractor.songs.push(song)
                 // /////////////////////////////////////////
-                await joinVoiceChannel({
-                    channelId: msg.member.voice.channel.id,
-                    guildId: msg.guild.id,
-                    adapterCreator: msg.guild.voiceAdapterCreator
-                })
 
-                // try {
-                //     const connection = await joinVoiceChannel({
-                //         channelId: msg.member.voice.channel.id,
-                //         guildId: msg.guild.id,
-                //         adapterCreator: msg.guild.voiceAdapterCreator
-                //     })
-                //     queue_constractor.connection = connection
-                //     console.log(connection)
 
-                //     // video_player(msg, msg.guild, queue_constractor.songs[0], connection)
-                // } catch (err) {
-                //     queue.delete(msg.guild.id)
-                //     msg.channel.send("There was an error connecting, plz try again later")
-                //     throw err
-                // }
+                try {
+                    const connection = await joinVoiceChannel({
+                        channelId: msg.member.voice.channel.id,
+                        guildId: msg.guild.id,
+                        adapterCreator: msg.guild.voiceAdapterCreator
+                    })
+                    queue_constractor.connection = connection
+
+
+                    video_player(msg, msg.guild, queue_constractor.songs[0], connection)
+                } catch (err) {
+                    queue.delete(msg.guild.id)
+                    msg.channel.send("There was an error connecting, plz try again later")
+                    throw err
+                }
             } else {
                 server_queue.songs.push(song)
-                console.log(server_queue.songs)
                 return msg.channel.send(`**${song.title}** has been added to the queue!`)
             }
             // ////////////////////////////////////////////////////////////////////////////////
@@ -65,12 +65,75 @@ module.exports = {
 
         } else if (command == 'q') show_queue(msg);
         else if (command == 'r') remove_song(msg, args);
-        else if (command == 'dc') disconnect(msg)
+        else if (command == 'dc') disconnect(msg);
+        else if (command == 'skip') skip_song(msg);
 
     }
 
 
 
+}
+const player = createAudioPlayer()
+const video_player = async (msg, guild, song, connection) => {
+    const song_queue = queue.get(guild.id)
+    // if (song_queue.songs[0] == undefined) {
+    //     connection.disconnect()
+    //     queue.delete(guild.id)
+    //     return
+    // }
+    // if (!song) {
+    //     song_queue.voice_channel.leave();
+    //     queue.delete(guild.id);
+    //     return;
+
+    let stream = await ytdl(song.url, {
+        filter: 'audioonly',
+        quality: 'highestaudio',
+        highWaterMark: 1 << 25
+    })
+    stream = createAudioResource(stream);
+
+    const subcription = connection.subscribe(player)
+
+    if (subcription) {
+
+
+        player.play(stream, { seek: 0, volume: 0.4 })
+        player.on(AudioPlayerStatus.Idle, () => {
+            song_queue.songs.shift();
+
+            // if (song_queue.songs[0] == undefined) {
+            //     // connection.disconnect()
+            //     queue.delete(guild.id)
+            //     return
+            // }
+            play_next(msg, guild, song_queue.songs[0], connection);
+
+
+        });
+        player.on('error', error => {
+            console.error(error)
+        })
+
+
+        await msg.channel.send(`Now Playing : **${song.title}**`)
+        // await song_queue.channel.send(`Now Playing : **${song.title}**`)
+
+
+    }
+
+
+}
+const play_next = async (msg, guild, song, connection) => {
+    const song_queue = queue.get(guild.id)
+    if (song == undefined) {
+        connection.disconnect()
+        queue.delete(guild.id)
+        return
+    } else {
+        video_player(msg, guild, song_queue.songs[0], connection)
+        return
+    }
 }
 const search = async (msg, args) => {
     if (ytdl.validateURL(args[0])) {
@@ -95,17 +158,25 @@ const search = async (msg, args) => {
 }
 
 const show_queue = async (msg) => {
-    const server_queue = queue.get(msg.guild.id)
-    let queue_lagu = server_queue.songs
+    try {
+        const server_queue = queue.get(msg.guild.id)
+        let queue_lagu = server_queue.songs
 
-    let list = ""
-    for (let i = 0; i < queue_lagu.length; i++) {
-        let song = (`${i + 1}) ${queue_lagu[i].title} \n`)
-        list += song
+        let list = "Playing : "
+
+        for (let i = 0; i < queue_lagu.length; i++) {
+            let song = (`${i + 1}) ${queue_lagu[i].title} \n`)
+            list += song
+        }
+        await msg.reply(list)
+    } catch (err) {
+        msg.channel.send("There is no song / error")
+        throw err
     }
-    await msg.reply(list)
 
 }
+
+
 
 const remove_song = async (msg, args) => {
     const server_queue = queue.get(msg.guild.id)
@@ -123,4 +194,9 @@ const disconnect = async (msg) => {
     queue.delete(msg.guild.id)
     msg.reply("Disconnected!")
 
+}
+
+const skip_song = async (msg) => {
+    player.stop()
+    msg.reply("Skipped ⏭️")
 }

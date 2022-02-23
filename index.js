@@ -42,26 +42,12 @@ client.on("messageCreate", msg => {
     const cmd = client.commands.find(a => a.aliases && a.aliases.includes(command))
     if (cmd) cmd.execute(msg, args, command)
 
-    // if (command == 'ping') {
-    //     client.commands.get('ping').execute(msg, args);
-
-    // }
-
-    // if (command == 'motivasi') {
-    //     client.commands.get('motivation').execute(msg)
-    // }
-
     if (command == 'info') {
         info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
         msg.reply(info_msg.toString())
     }
 
-    // if (command == 'p') {
-    //     if (!args.length) return msg.channel.send("no tittle song detected!, plz try again")
-    //     client.commands.get('play').execute(msg, args, command, client)
 
-
-    // }
 
 })
 
