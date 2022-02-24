@@ -1,7 +1,7 @@
 const ytdl = require("ytdl-core");
 const ytSearch = require("yt-search");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, getVoiceConnection } = require("@discordjs/voice");
-const player = createAudioPlayer()
+
 const queue = new Map()
 play_trigger = ['play', 'p']
 // if (play_trigger.some(word => command.includes(word)))
@@ -9,12 +9,13 @@ play_trigger = ['play', 'p']
 
 module.exports = {
     name: 'play',
-    aliases: ['play', 'p', 'q', 'r', 'dc', 'skip'],
+    aliases: ['play', 'p', 'q', 'r', 'dc', 'skip', 'loop'],
     description: 'play a song',
     async execute(msg, args, command, client,) {
 
         const server_queue = queue.get(msg.guild.id);
         const voice_channel = msg.member.voice.channel;
+
 
 
 
@@ -34,7 +35,9 @@ module.exports = {
                     connection: null,
                     playing: true,
                     songs: [],
-                    songDispatcher: null
+                    songDispatcher: null,
+                    loop: false,
+                    player: createAudioPlayer()
                 }
 
                 queue.set(msg.guild.id, queue_constractor)
@@ -71,6 +74,8 @@ module.exports = {
         else if (command == 'r') remove_song(msg, args);
         else if (command == 'dc') disconnect(msg);
         else if (command == 'skip') skip_song(msg);
+        else if (command == 'loop') loop_mode(msg);
+
 
     }
 
@@ -99,16 +104,24 @@ const video_player = async (guild, msg, connection, song) => {
     if (subcription) {
         try {
             player.play(stream, { seek: 0, volume: 0.4 })
-            song_queue.songs.shift()
+
             player.on(AudioPlayerStatus.Idle, () => {
                 const song_queue = queue.get(guild.id)
-                console.log("idlee")
+                if (song_queue.loop) song_queue.songs.push(song_queue.songs[0])
+                console.log(song_queue.songs)
+                song_queue.songs.shift()
+
+                console.log(song_queue.loop)
+                console.log(song_queue.songs)
                 if (song_queue.songs[0] != undefined) {
-                    play_next(msg.guild, msg, connection, song_queue.songs[0])
+                    play_next(msg.guild, msg, song_queue.songs[0])
 
                     return
                 } else {
                     connection.disconnect();
+                    queue.delete(guild.id)
+                    song_queue.loop = false
+                    return
 
 
                 }
@@ -125,7 +138,7 @@ const video_player = async (guild, msg, connection, song) => {
     }
 
 }
-const play_next = async (guild, msg, connection, song,) => {
+const play_next = async (guild, msg, song,) => {
     const song_queue = queue.get(guild.id)
 
     if (!song) {
@@ -143,7 +156,7 @@ const play_next = async (guild, msg, connection, song,) => {
 
     try {
         player.play(stream, { seek: 0, volume: 0.4 })
-        song_queue.songs.shift()
+
 
         await msg.channel.send(`Now Playing : **${song.title}**`)
         // await song_queue.channel.send(`Now Playing : **${song.title}**`)
@@ -210,16 +223,26 @@ const remove_song = async (msg, args) => {
 }
 
 const disconnect = async (msg) => {
+    const server_queue = queue.get(msg.guild.id);
+    server_queue.loop = false
     const connection = getVoiceConnection(msg.guild.id);
     connection.destroy();
     queue.delete(msg.guild.id)
+
     msg.reply("Disconnected!")
 
 }
 
+const loop_mode = async (msg) => {
+    const server_queue = queue.get(msg.guild.id)
+    if (server_queue.loop) server_queue.loop = false
+    else server_queue.loop = true
+    msg.reply(`Loop Mode : ${server_queue.loop}`)
+    return
+}
+
 const skip_song = async (msg) => {
     player.stop()
-
     msg.reply("Skipped ⏭️")
     return
 }

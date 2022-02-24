@@ -47,6 +47,10 @@ client.on("messageCreate", msg => {
         msg.reply(info_msg.toString())
     }
 
+    // if (command == 'loop') {
+    //     cmd.
+    // }
+
 
 
 })
