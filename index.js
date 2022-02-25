@@ -15,7 +15,7 @@ for (const file of commandFiles) {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Array~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Array for Status
-const Status_bot = ["Music Bot", "Music Bot", "-info for some info"];
+const Status_bot = ["Music Bot", "Music Bot", "-info for some info", "Profile picture from Freepik.com "];
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -42,10 +42,10 @@ client.on("messageCreate", msg => {
     const cmd = client.commands.find(a => a.aliases && a.aliases.includes(command))
     if (cmd) cmd.execute(msg, args, command)
 
-    if (command == 'info') {
-        info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
-        msg.reply(info_msg.toString())
-    }
+    // if (command == 'info') {
+    //     info_msg = fs.readFileSync("./editable/info_msg.txt", "utf-8");
+    //     msg.reply(info_msg.toString())
+    // }
 
     // if (command == 'loop') {
     //     cmd.

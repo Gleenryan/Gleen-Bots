@@ -42,6 +42,7 @@ module.exports = {
 
                 queue.set(msg.guild.id, queue_constractor)
                 queue_constractor.songs.push(song)
+                player = queue_constractor.player
                 // /////////////////////////////////////////
 
 
@@ -108,11 +109,9 @@ const video_player = async (guild, msg, connection, song) => {
             player.on(AudioPlayerStatus.Idle, () => {
                 const song_queue = queue.get(guild.id)
                 if (song_queue.loop) song_queue.songs.push(song_queue.songs[0])
-                console.log(song_queue.songs)
+
                 song_queue.songs.shift()
 
-                console.log(song_queue.loop)
-                console.log(song_queue.songs)
                 if (song_queue.songs[0] != undefined) {
                     play_next(msg.guild, msg, song_queue.songs[0])
 
