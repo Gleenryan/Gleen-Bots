@@ -1,2 +1,2 @@
 # Astro Bots
- my music bots
+ Discord music bots
