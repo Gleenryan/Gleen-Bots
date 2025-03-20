@@ -1,7 +1,7 @@
 # Astro Bots
- Discord music bots, works like groovy
+ Discord music bots, works like groovy, made in 2022
 
+Updated in 2025 because
+The play music system (youtube-dl  and distube) is outdated
 
-The play music system don't work anymore because it is outdated
-
-@2022
+@2022 - 2025
