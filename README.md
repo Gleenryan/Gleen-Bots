@@ -1,4 +1,4 @@
-# Astro Bots
+# Gleen Bot
  Discord music bots, works like groovy, made in 2022
  
  Demo vids : https://github.com/user-attachments/assets/a356d3f0-6a3a-403a-9d20-df0dd0ca880a
